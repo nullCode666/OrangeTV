@@ -43,3 +43,9 @@ sitemap-*.xml
 # generated files
 src/lib/runtime.ts
 public/manifest.json
+.pnpm-store
+public/sw.js
+public/workbox-*.js
+deploy/
+yiqikan-deploy.tar.gz
+yiqikan-deploy.zip

@@ -15,6 +15,10 @@ const STORAGE_TYPE =
     | 'kvrocks'
     | undefined) || 'localstorage';
 
+// 观看进度、收藏、搜索历史、跳过片头片尾配置只保存在浏览器 localStorage。
+// 服务端存储仅保留账号、头像、好友/聊天、管理配置等需要跨设备或全站共享的数据。
+const STORE_PERSONAL_DATA_ON_SERVER = false;
+
 // 简化的内存存储实现（用于localstorage模式）
 class MemoryStorage implements IStorage {
   private data: { [key: string]: any } = {};
@@ -303,6 +307,8 @@ export class DbManager {
     source: string,
     id: string
   ): Promise<PlayRecord | null> {
+    if (!STORE_PERSONAL_DATA_ON_SERVER) return null;
+
     const key = generateStorageKey(source, id);
     return this.storage.getPlayRecord(userName, key);
   }
@@ -313,6 +319,8 @@ export class DbManager {
     id: string,
     record: PlayRecord
   ): Promise<void> {
+    if (!STORE_PERSONAL_DATA_ON_SERVER) return;
+
     const key = generateStorageKey(source, id);
     await this.storage.setPlayRecord(userName, key, record);
   }
@@ -320,6 +328,8 @@ export class DbManager {
   async getAllPlayRecords(userName: string): Promise<{
     [key: string]: PlayRecord;
   }> {
+    if (!STORE_PERSONAL_DATA_ON_SERVER) return {};
+
     return this.storage.getAllPlayRecords(userName);
   }
 
@@ -328,6 +338,8 @@ export class DbManager {
     source: string,
     id: string
   ): Promise<void> {
+    if (!STORE_PERSONAL_DATA_ON_SERVER) return;
+
     const key = generateStorageKey(source, id);
     await this.storage.deletePlayRecord(userName, key);
   }
@@ -338,6 +350,8 @@ export class DbManager {
     source: string,
     id: string
   ): Promise<Favorite | null> {
+    if (!STORE_PERSONAL_DATA_ON_SERVER) return null;
+
     const key = generateStorageKey(source, id);
     return this.storage.getFavorite(userName, key);
   }
@@ -348,6 +362,8 @@ export class DbManager {
     id: string,
     favorite: Favorite
   ): Promise<void> {
+    if (!STORE_PERSONAL_DATA_ON_SERVER) return;
+
     const key = generateStorageKey(source, id);
     await this.storage.setFavorite(userName, key, favorite);
   }
@@ -355,6 +371,8 @@ export class DbManager {
   async getAllFavorites(
     userName: string
   ): Promise<{ [key: string]: Favorite }> {
+    if (!STORE_PERSONAL_DATA_ON_SERVER) return {};
+
     return this.storage.getAllFavorites(userName);
   }
 
@@ -363,6 +381,8 @@ export class DbManager {
     source: string,
     id: string
   ): Promise<void> {
+    if (!STORE_PERSONAL_DATA_ON_SERVER) return;
+
     const key = generateStorageKey(source, id);
     await this.storage.deleteFavorite(userName, key);
   }
@@ -400,14 +420,20 @@ export class DbManager {
 
   // ---------- 搜索历史 ----------
   async getSearchHistory(userName: string): Promise<string[]> {
+    if (!STORE_PERSONAL_DATA_ON_SERVER) return [];
+
     return this.storage.getSearchHistory(userName);
   }
 
   async addSearchHistory(userName: string, keyword: string): Promise<void> {
+    if (!STORE_PERSONAL_DATA_ON_SERVER) return;
+
     await this.storage.addSearchHistory(userName, keyword);
   }
 
   async deleteSearchHistory(userName: string, keyword?: string): Promise<void> {
+    if (!STORE_PERSONAL_DATA_ON_SERVER) return;
+
     await this.storage.deleteSearchHistory(userName, keyword);
   }
 
@@ -439,6 +465,8 @@ export class DbManager {
     source: string,
     id: string
   ): Promise<SkipConfig | null> {
+    if (!STORE_PERSONAL_DATA_ON_SERVER) return null;
+
     if (typeof (this.storage as any).getSkipConfig === 'function') {
       return (this.storage as any).getSkipConfig(userName, source, id);
     }
@@ -451,6 +479,8 @@ export class DbManager {
     id: string,
     config: SkipConfig
   ): Promise<void> {
+    if (!STORE_PERSONAL_DATA_ON_SERVER) return;
+
     if (typeof (this.storage as any).setSkipConfig === 'function') {
       await (this.storage as any).setSkipConfig(userName, source, id, config);
     }
@@ -461,6 +491,8 @@ export class DbManager {
     source: string,
     id: string
   ): Promise<void> {
+    if (!STORE_PERSONAL_DATA_ON_SERVER) return;
+
     if (typeof (this.storage as any).deleteSkipConfig === 'function') {
       await (this.storage as any).deleteSkipConfig(userName, source, id);
     }
@@ -469,6 +501,8 @@ export class DbManager {
   async getAllSkipConfigs(
     userName: string
   ): Promise<{ [key: string]: SkipConfig }> {
+    if (!STORE_PERSONAL_DATA_ON_SERVER) return {};
+
     if (typeof (this.storage as any).getAllSkipConfigs === 'function') {
       return (this.storage as any).getAllSkipConfigs(userName);
     }

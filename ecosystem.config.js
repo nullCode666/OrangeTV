@@ -19,7 +19,7 @@ module.exports = {
         PASSWORD: 'orange',
         NEXT_PUBLIC_SITE_NAME: '一起看',
         NEXT_PUBLIC_STORAGE_TYPE: 'redis',
-        REDIS_URL: 'redis://127.0.0.1:6380',
+        REDIS_URL: 'redis://127.0.0.1:6379',
         NEXT_PUBLIC_REQUIRE_DEVICE_CODE: 'false',
 
         NEXT_PUBLIC_DOUBAN_PROXY_TYPE: 'cmliussss-cdn-tencent',
