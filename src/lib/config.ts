@@ -18,11 +18,24 @@ export interface LiveCfg {
   epg?: string; // 节目单
 }
 
+interface TvBoxSite {
+  key?: string;
+  name?: string;
+  type?: number;
+  api?: string;
+  searchable?: number;
+}
+
+interface TvBoxLiveCfg extends LiveCfg {
+  key?: string;
+}
+
 interface ConfigFileStruct {
   cache_time?: number;
   api_site?: {
     [key: string]: ApiSite;
   };
+  sites?: TvBoxSite[];
   custom_category?: {
     name?: string;
     type: 'movie' | 'tv';
@@ -30,7 +43,7 @@ interface ConfigFileStruct {
   }[];
   lives?: {
     [key: string]: LiveCfg;
-  }
+  } | TvBoxLiveCfg[];
 }
 
 export const API_CONFIG = {
@@ -64,6 +77,91 @@ export const API_CONFIG = {
 // 在模块加载时根据环境决定配置来源
 let cachedConfig: AdminConfig;
 
+type ConfigSourceEntry = [string, ApiSite];
+type ConfigLiveEntry = [string, LiveCfg];
+
+function isPlainJson(content: string): boolean {
+  try {
+    JSON.parse(content);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export async function decodeConfigContent(content: string): Promise<string> {
+  const trimmed = content.trim();
+  if (isPlainJson(trimmed)) {
+    return trimmed;
+  }
+
+  const bs58 = (await import('bs58')).default;
+  const decodedBytes = bs58.decode(trimmed);
+  const decodedContent = new TextDecoder().decode(decodedBytes);
+
+  if (!isPlainJson(decodedContent)) {
+    throw new Error('配置文件格式错误，请检查 JSON 语法');
+  }
+
+  return decodedContent;
+}
+
+function getConfigSourceEntries(fileConfig: ConfigFileStruct): ConfigSourceEntry[] {
+  const entries: ConfigSourceEntry[] = Object.entries(fileConfig.api_site || {});
+
+  (fileConfig.sites || []).forEach((site, index) => {
+    const api = normalizeCmsApiUrl(site.api);
+    const key = site.key?.trim() || `tvbox_site_${index + 1}`;
+
+    // TVBox/TCBox type=3 depends on CSP spider plugins, which this app cannot run.
+    // Only direct CMS-style HTTP sources can be mapped into OrangeTV's api_site.
+    if (site.type !== 0 || !api || !/^https?:\/\//i.test(api)) {
+      return;
+    }
+
+    entries.push([
+      key,
+      {
+        key,
+        name: site.name || key,
+        api,
+      },
+    ]);
+  });
+
+  return entries;
+}
+
+function normalizeCmsApiUrl(api?: string): string {
+  const trimmed = api?.trim() || '';
+  if (!trimmed) {
+    return '';
+  }
+
+  return trimmed
+    .replace(/\/at\/(?:xml|json)\/?$/i, '')
+    .replace(/\/?$/i, '');
+}
+
+function getConfigLiveEntries(fileConfig: ConfigFileStruct): ConfigLiveEntry[] {
+  const lives = fileConfig.lives;
+  if (!lives) {
+    return [];
+  }
+
+  if (Array.isArray(lives)) {
+    return lives
+      .map((live, index) => [
+        live.key?.trim() || `tvbox_live_${index + 1}`,
+        live,
+      ] as ConfigLiveEntry)
+      .filter(([, live]) => Boolean(live?.name && live?.url));
+  }
+
+  return Object.entries(lives).filter(([, live]) =>
+    Boolean(live?.name && live?.url)
+  );
+}
 
 // 从配置文件补充管理员配置
 export function refineConfig(adminConfig: AdminConfig): AdminConfig {
@@ -75,7 +173,7 @@ export function refineConfig(adminConfig: AdminConfig): AdminConfig {
   }
 
   // 合并文件中的源信息
-  const apiSitesFromFile = Object.entries(fileConfig.api_site || []);
+  const apiSitesFromFile = getConfigSourceEntries(fileConfig);
   const currentApiSites = new Map(
     (adminConfig.SourceConfig || []).map((s) => [s.key, s])
   );
@@ -166,7 +264,7 @@ export function refineConfig(adminConfig: AdminConfig): AdminConfig {
   // 将 Map 转换回数组
   adminConfig.CustomCategories = Array.from(currentCustomCategories.values());
 
-  const livesFromFile = Object.entries(fileConfig.lives || []);
+  const livesFromFile = getConfigLiveEntries(fileConfig);
   const currentLives = new Map(
     (adminConfig.LiveConfig || []).map((l) => [l.key, l])
   );
@@ -273,7 +371,7 @@ async function getInitConfig(configFile: string, subConfig: {
   adminConfig.UserConfig.Users = allUsers as any;
 
   // 从配置文件中补充源信息
-  Object.entries(cfgFile.api_site || []).forEach(([key, site]) => {
+  getConfigSourceEntries(cfgFile).forEach(([key, site]) => {
     adminConfig.SourceConfig.push({
       key: key,
       name: site.name,
@@ -296,7 +394,7 @@ async function getInitConfig(configFile: string, subConfig: {
   });
 
   // 从配置文件中补充直播源信息
-  Object.entries(cfgFile.lives || []).forEach(([key, live]) => {
+  getConfigLiveEntries(cfgFile).forEach(([key, live]) => {
     if (!adminConfig.LiveConfig) {
       adminConfig.LiveConfig = [];
     }

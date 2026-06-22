@@ -10,7 +10,7 @@ const wsPort = 3001;
 // 启动独立WebSocket服务器
 console.log('🔌 启动 WebSocket 服务器...');
 const { createStandaloneWebSocketServer } = require('./standalone-websocket');
-createStandaloneWebSocketServer(wsPort);
+const websocketServer = createStandaloneWebSocketServer(wsPort);
 
 // 启动Next.js
 const app = next({ dev, hostname, port });
@@ -36,17 +36,44 @@ app.prepare().then(() => {
   });
 
   // 优雅关闭
+  let isShuttingDown = false;
   const cleanup = () => {
+    if (isShuttingDown) return;
+    isShuttingDown = true;
+
     console.log('\n🛑 正在关闭服务器...');
-    server.close(() => {
+
+    const forceExitTimer = setTimeout(() => {
+      console.warn('关闭超时，强制退出进程');
       process.exit(0);
-    });
+    }, 1500);
+
+    const exit = () => {
+      clearTimeout(forceExitTimer);
+      process.exit(0);
+    };
+
+    try {
+      websocketServer.clients.forEach((client) => {
+        try {
+          client.terminate();
+        } catch {
+          // ignore
+        }
+      });
+      websocketServer.close();
+    } catch (error) {
+      console.warn('关闭 WebSocket 服务器失败:', error);
+    }
+
+    server.close(exit);
+    server.closeAllConnections?.();
+    server.closeIdleConnections?.();
   };
 
   process.on('SIGINT', cleanup);
   process.on('SIGTERM', cleanup);
 });
-
 
 
 
