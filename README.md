@@ -214,6 +214,19 @@ custom_category 支持的自定义分类已知如下：
 
 dockge/komodo 等 docker compose UI 也有自动更新功能
 
+## PM2 启动
+
+项目内置 `ecosystem.config.js`，可以直接把生产环境变量写在该文件中。
+
+```bash
+pnpm install
+pnpm build
+pm2 start ecosystem.config.js
+pm2 save
+```
+
+如果要修改账号、密码、端口或 Redis 地址，直接编辑 `ecosystem.config.js` 里的 `env` 字段。
+
 ## 环境变量
 
 | 变量                                | 说明                                         | 可选值                           | 默认值                                                                                                                     |
