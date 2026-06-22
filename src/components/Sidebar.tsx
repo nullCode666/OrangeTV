@@ -2,7 +2,7 @@
 
 'use client';
 
-import { Cat, Clover, Film, Home, Menu, PlayCircle, Radio, Search, Star, Tv, ExternalLink } from 'lucide-react';
+import { Cat, Clover, ExternalLink, Film, Home, Menu, PlayCircle, Radio, Search, Server, Star, Tv } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
@@ -189,6 +189,11 @@ const Sidebar = ({ onToggle, activePath = '/' }: SidebarProps) => {
       label: '直播',
       href: '/live',
     },
+    {
+      icon: Server,
+      label: '资源站',
+      href: '/resources',
+    },
   ]);
 
   useEffect(() => {
@@ -296,7 +301,8 @@ const Sidebar = ({ onToggle, activePath = '/' }: SidebarProps) => {
                     decodedActive === decodedItemHref ||
                     (decodedActive.startsWith('/douban') &&
                       decodedActive.includes(`type=${typeMatch}`)) ||
-                    (item.href === '/shortdrama' && decodedActive.startsWith('/shortdrama'));
+                    (item.href === '/shortdrama' && decodedActive.startsWith('/shortdrama')) ||
+                    (item.href === '/resources' && decodedActive.startsWith('/resources'));
                   const Icon = item.icon;
                   return (
                     <Link

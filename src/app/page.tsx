@@ -72,9 +72,9 @@ function HomeClient() {
       try {
         setLoading(true);
 
-        // 并行获取热门电影、热门剧集和热门综艺
-        const [moviesData, tvShowsData, varietyShowsData, bangumiCalendarData] =
-          await Promise.all([
+        // 并行获取首页数据；单个来源失败不影响其它模块展示。
+        const [moviesData, tvShowsData, varietyShowsData, calendarData] =
+          await Promise.allSettled([
             getDoubanCategories({
               kind: 'movie',
               category: '热门',
@@ -85,19 +85,24 @@ function HomeClient() {
             GetBangumiCalendarData(),
           ]);
 
-        if (moviesData.code === 200) {
-          setHotMovies(moviesData.list);
+        if (moviesData.status === 'fulfilled' && moviesData.value.code === 200) {
+          setHotMovies(moviesData.value.list);
         }
 
-        if (tvShowsData.code === 200) {
-          setHotTvShows(tvShowsData.list);
+        if (tvShowsData.status === 'fulfilled' && tvShowsData.value.code === 200) {
+          setHotTvShows(tvShowsData.value.list);
         }
 
-        if (varietyShowsData.code === 200) {
-          setHotVarietyShows(varietyShowsData.list);
+        if (
+          varietyShowsData.status === 'fulfilled' &&
+          varietyShowsData.value.code === 200
+        ) {
+          setHotVarietyShows(varietyShowsData.value.list);
         }
 
-        setBangumiCalendarData(bangumiCalendarData);
+        if (calendarData.status === 'fulfilled') {
+          setBangumiCalendarData(calendarData.value);
+        }
       } catch (error) {
         console.error('获取推荐数据失败:', error);
       } finally {

@@ -1,5 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { API_CONFIG } from '@/lib/config';
+import { fetchCmsShortDramaDetail } from '@/lib/shortdrama-cms';
+
+export const dynamic = 'force-dynamic';
+
+function toHeaderValue(value: string): string {
+  return encodeURIComponent(value).slice(0, 500);
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -243,6 +250,27 @@ export async function GET(request: NextRequest) {
 
     console.warn(`🔄 [短剧API] 错误类型: ${errorCategory}，启用备用数据`);
 
+    try {
+      const fallbackData = await fetchCmsShortDramaDetail(errorId || '');
+      console.log('🔧 [短剧API] 返回CMS备用短剧数据:', {
+        videoName: fallbackData.videoName,
+        totalEpisodes: fallbackData.totalEpisodes,
+        errorCategory,
+        firstEpisodeUrl: fallbackData.results[0]?.parsedUrl,
+      });
+
+      return NextResponse.json(fallbackData, {
+        headers: {
+          'X-Fallback-Data': 'cms',
+          'X-Error-Category': toHeaderValue(errorCategory),
+          'X-Original-Error':
+            toHeaderValue(error instanceof Error ? error.message : String(error)),
+        },
+      });
+    } catch (fallbackError) {
+      console.error('💥 [短剧API] CMS备用数据也失败:', fallbackError);
+    }
+
     const mockData = {
       videoId: parseInt(errorId || '1') || 1,
       videoName: `短剧播放示例 (ID: ${errorId})`,
@@ -286,8 +314,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(mockData, {
       headers: {
         'X-Fallback-Data': 'true',
-        'X-Error-Category': errorCategory,
-        'X-Original-Error': error instanceof Error ? error.message : String(error)
+        'X-Error-Category': toHeaderValue(errorCategory),
+        'X-Original-Error': toHeaderValue(error instanceof Error ? error.message : String(error))
       }
     });
   }

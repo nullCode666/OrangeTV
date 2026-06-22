@@ -38,7 +38,7 @@ export interface VideoCardProps {
   source_names?: string[];
   progress?: number;
   year?: string;
-  from: 'playrecord' | 'favorite' | 'search' | 'douban' | 'shortdrama';
+  from: 'playrecord' | 'favorite' | 'search' | 'douban' | 'shortdrama' | 'resource';
   currentEpisode?: number;
   douban_id?: number;
   onDelete?: () => void;
@@ -389,6 +389,16 @@ const VideoCard = forwardRef<VideoCardHandle, VideoCardProps>(function VideoCard
         showCheckCircle: false,
         showDoubanLink: false,
         showRating: !!rate,
+        showYear: true,
+      },
+      resource: {
+        showSourceName: true,
+        showProgress: false,
+        showPlayButton: true,
+        showHeart: true,
+        showCheckCircle: false,
+        showDoubanLink: false,
+        showRating: false,
         showYear: true,
       },
     };

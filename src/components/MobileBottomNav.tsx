@@ -2,7 +2,7 @@
 
 'use client';
 
-import { Cat, Clover, Film, Home, Play, Radio, Star, Tv } from 'lucide-react';
+import { Cat, Clover, Film, Home, Play, Radio, Server, Star, Tv } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -52,6 +52,11 @@ const MobileBottomNav = ({ activePath }: MobileBottomNavProps) => {
       label: '直播',
       href: '/live',
     },
+    {
+      icon: Server,
+      label: '资源站',
+      href: '/resources',
+    },
   ]);
 
   useEffect(() => {
@@ -82,6 +87,10 @@ const MobileBottomNav = ({ activePath }: MobileBottomNavProps) => {
 
     // 短剧页面的特殊处理
     if (href === '/shortdrama' && decodedActive.startsWith('/shortdrama')) {
+      return true;
+    }
+
+    if (href === '/resources' && decodedActive.startsWith('/resources')) {
       return true;
     }
 

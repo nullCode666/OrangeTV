@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { API_CONFIG } from '@/lib/config';
+import { fetchCmsShortDramaList } from '@/lib/shortdrama-cms';
+
+export const dynamic = 'force-dynamic';
 
 // 转换外部API数据格式到内部格式 - 分类热搜API直接使用id作为视频ID
 function transformExternalData(externalItem: any) {
@@ -64,6 +67,17 @@ export async function GET(request: NextRequest) {
     }
   } catch (error) {
     console.error('Short drama list API error:', error);
+
+    try {
+      const { searchParams } = new URL(request.url);
+      const fallbackData = await fetchCmsShortDramaList(
+        searchParams.get('page') || '1',
+        searchParams.get('categoryId') || '30'
+      );
+      return NextResponse.json(fallbackData);
+    } catch (fallbackError) {
+      console.error('Short drama list CMS fallback error:', fallbackError);
+    }
 
     // 返回默认列表数据作为备用（格式与真实分类热搜API一致）
     const mockData = Array.from({ length: 25 }, (_, index) => {

@@ -20,6 +20,11 @@ import DoubanSelector from '@/components/DoubanSelector';
 import PageLayout from '@/components/PageLayout';
 import VideoCard from '@/components/VideoCard';
 
+function getTodayWeekday(): string {
+  const weekdayMap = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  return weekdayMap[new Date().getDay()];
+}
+
 function DoubanPageClient() {
   const searchParams = useSearchParams();
   const [doubanData, setDoubanData] = useState<DoubanItem[]>([]);
@@ -76,7 +81,9 @@ function DoubanPageClient() {
   });
 
   // 星期选择器状态
-  const [selectedWeekday, setSelectedWeekday] = useState<string>('');
+  const [selectedWeekday, setSelectedWeekday] = useState<string>(
+    getTodayWeekday()
+  );
 
   // 获取自定义分类数据
   useEffect(() => {
@@ -160,6 +167,7 @@ function DoubanPageClient() {
       } else if (type === 'anime') {
         setPrimarySelection('每日放送');
         setSecondarySelection('全部');
+        setSelectedWeekday(getTodayWeekday());
       } else {
         setPrimarySelection('');
         setSecondarySelection('全部');
@@ -287,10 +295,11 @@ function DoubanPageClient() {
         }
       } else if (type === 'anime' && primarySelection === '每日放送') {
         const calendarData = await GetBangumiCalendarData();
+        const targetWeekday = selectedWeekday || getTodayWeekday();
         const weekdayData = calendarData.find(
-          (item) => item.weekday.en === selectedWeekday
+          (item) => item.weekday.en === targetWeekday
         );
-        if (weekdayData) {
+        if (weekdayData && weekdayData.items.length > 0) {
           data = {
             code: 200,
             message: 'success',
@@ -309,7 +318,13 @@ function DoubanPageClient() {
             })),
           };
         } else {
-          throw new Error('没有找到对应的日期');
+          data = await getDoubanRecommends({
+            kind: 'tv',
+            pageLimit: 25,
+            pageStart: 0,
+            category: '动画',
+            format: '电视剧',
+          });
         }
       } else if (type === 'anime') {
         data = await getDoubanRecommends({
@@ -679,6 +694,11 @@ function DoubanPageClient() {
   );
 
   const handleWeekdayChange = useCallback((weekday: string) => {
+    setLoading(true);
+    setCurrentPage(0);
+    setDoubanData([]);
+    setHasMore(true);
+    setIsLoadingMore(false);
     setSelectedWeekday(weekday);
   }, []);
 

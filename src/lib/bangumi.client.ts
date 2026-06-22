@@ -23,7 +23,24 @@ export interface BangumiCalendarData {
 }
 
 export async function GetBangumiCalendarData(): Promise<BangumiCalendarData[]> {
-  const response = await fetch('https://api.bgm.tv/calendar');
-  const data = await response.json();
-  return data;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 8000);
+
+  try {
+    const response = await fetch('https://api.bgm.tv/calendar', {
+      signal: controller.signal,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Bangumi calendar request failed: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return Array.isArray(data) ? data : [];
+  } catch (error) {
+    console.warn('获取 Bangumi 每日放送失败:', error);
+    return [];
+  } finally {
+    clearTimeout(timeoutId);
+  }
 }

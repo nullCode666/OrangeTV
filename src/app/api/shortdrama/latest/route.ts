@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { API_CONFIG } from '@/lib/config';
+import {
+  fetchCmsShortDramaLatest,
+  normalizeCmsShortDramaItem,
+} from '@/lib/shortdrama-cms';
+
+export const dynamic = 'force-dynamic';
 
 // 转换外部API数据格式到内部格式 - 最新剧集API使用vod_id作为实际视频ID
 function transformExternalData(externalItem: any) {
@@ -51,6 +57,15 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Short drama latest API error:', error);
 
+    try {
+      const fallbackData = await fetchCmsShortDramaLatest(
+        new URL(request.url).searchParams.get('page') || '1'
+      );
+      return NextResponse.json(fallbackData);
+    } catch (fallbackError) {
+      console.error('Short drama latest CMS fallback error:', fallbackError);
+    }
+
     // 返回默认最新数据作为备用（格式与真实API一致）
     const mockData = Array.from({ length: 25 }, (_, index) => {
       const classOptions = ['都市情感', '古装宫廷', '现代言情', '豪门世家', '职场励志'];
@@ -75,7 +90,7 @@ export async function GET(request: NextRequest) {
       };
     });
 
-    // 确保返回数组
-    return NextResponse.json(mockData);
+    // 确保返回页面可直接渲染的内部格式
+    return NextResponse.json(mockData.map(normalizeCmsShortDramaItem));
   }
 }
