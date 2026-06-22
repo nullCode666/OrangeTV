@@ -11,7 +11,7 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const url = searchParams.get('url');
   const allowCORS = searchParams.get('allowCORS') === 'true';
-  const source = searchParams.get('OrangeTV-source');
+  const source = searchParams.get('一起看-source');
   if (!url) {
     return NextResponse.json({ error: 'Missing url' }, { status: 400 });
   }

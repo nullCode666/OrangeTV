@@ -114,7 +114,7 @@ function getConfigSourceEntries(fileConfig: ConfigFileStruct): ConfigSourceEntry
     const key = site.key?.trim() || `tvbox_site_${index + 1}`;
 
     // TVBox/TCBox type=3 depends on CSP spider plugins, which this app cannot run.
-    // Only direct CMS-style HTTP sources can be mapped into OrangeTV's api_site.
+    // Only direct CMS-style HTTP sources can be mapped into 一起看's api_site.
     if (site.type !== 0 || !api || !/^https?:\/\//i.test(api)) {
       return;
     }
@@ -323,7 +323,7 @@ async function getInitConfig(configFile: string, subConfig: {
     ConfigFile: configFile,
     ConfigSubscribtion: subConfig,
     SiteConfig: {
-      SiteName: process.env.NEXT_PUBLIC_SITE_NAME || 'OrangeTV',
+      SiteName: process.env.NEXT_PUBLIC_SITE_NAME || '一起看',
       Announcement:
         process.env.ANNOUNCEMENT ||
         '本网站仅提供影视信息搜索服务，所有内容均来自第三方网站。本站不存储任何视频资源，不对任何内容的准确性、合法性、完整性负责。',
@@ -458,7 +458,7 @@ export function configSelfCheck(adminConfig: AdminConfig): AdminConfig {
   // 确保 SiteConfig 及其属性存在
   if (!adminConfig.SiteConfig) {
     adminConfig.SiteConfig = {
-      SiteName: process.env.NEXT_PUBLIC_SITE_NAME || 'OrangeTV',
+      SiteName: process.env.NEXT_PUBLIC_SITE_NAME || '一起看',
       Announcement: process.env.ANNOUNCEMENT || '本网站仅提供影视信息搜索服务，所有内容均来自第三方网站。本站不存储任何视频资源，不对任何内容的准确性、合法性、完整性负责。',
       SearchDownstreamMaxPage: Number(process.env.NEXT_PUBLIC_SEARCH_MAX_PAGE) || 5,
       SiteInterfaceCacheTime: 7200,

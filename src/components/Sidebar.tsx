@@ -328,15 +328,15 @@ const Sidebar = ({ onToggle, activePath = '/' }: SidebarProps) => {
                   <div className='text-xs text-gray-500 dark:text-gray-400 text-center px-2 leading-relaxed'>
                     <span>本项目基于 </span>
                     <button
-                      onClick={() => window.open('https://github.com/MoonTechLab/LunaTV', '_blank')}
+                      onClick={() => window.open('https://github.com', '_blank')}
                       className='text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium transition-colors'
                     >
-                      MoonTV
+                      开源项目
                     </button>
                     <button
-                      onClick={() => window.open('https://github.com/MoonTechLab/LunaTV', '_blank')}
+                      onClick={() => window.open('https://github.com', '_blank')}
                       className='text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors ml-1'
-                      title='访问 MoonTV 项目'
+                      title='访问开源项目'
                     >
                       <ExternalLink className='h-3 w-3 inline' />
                     </button>
@@ -345,9 +345,9 @@ const Sidebar = ({ onToggle, activePath = '/' }: SidebarProps) => {
                 ) : (
                   <div className='flex justify-center'>
                     <button
-                      onClick={() => window.open('https://github.com/MoonTechLab/LunaTV', '_blank')}
+                      onClick={() => window.open('https://github.com', '_blank')}
                       className='text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors p-1'
-                      title='基于 MoonTV 的二次开发'
+                      title='基于 开源项目 的二次开发'
                     >
                       <ExternalLink className='h-4 w-4' />
                     </button>

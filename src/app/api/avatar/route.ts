@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { getAuthInfoFromCookie } from '@/lib/auth';
+import { DEFAULT_AVATAR_URL } from '@/lib/avatar';
 import { db } from '@/lib/db';
 
 export const runtime = 'nodejs';
@@ -22,11 +23,7 @@ export async function GET(request: NextRequest) {
 
     const avatar = await db.getUserAvatar(targetUser);
 
-    if (!avatar) {
-      return NextResponse.json({ avatar: null });
-    }
-
-    return NextResponse.json({ avatar });
+    return NextResponse.json({ avatar: avatar || DEFAULT_AVATAR_URL });
   } catch (error) {
     console.error('获取头像失败:', error);
     return NextResponse.json({ error: '获取头像失败' }, { status: 500 });

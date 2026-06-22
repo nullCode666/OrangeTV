@@ -23,11 +23,12 @@ import ReactCrop, { Crop, PercentCrop, PixelCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 
 import { getAuthInfoFromBrowserCookie } from '@/lib/auth';
+import { DEFAULT_AVATAR_URL } from '@/lib/avatar';
 import { CURRENT_VERSION } from '@/lib/version';
 import { checkForUpdates, UpdateStatus } from '@/lib/version_check';
 
-import { VersionPanel } from './VersionPanel';
 import { useToast } from './Toast';
+import { VersionPanel } from './VersionPanel';
 
 interface AuthInfo {
   username?: string;
@@ -46,7 +47,7 @@ export const UserMenu: React.FC = () => {
   const [authInfo, setAuthInfo] = useState<AuthInfo | null>(null);
   const [storageType, setStorageType] = useState<string>('localstorage');
   const [mounted, setMounted] = useState(false);
-  const [avatarUrl, setAvatarUrl] = useState<string>('');
+  const [avatarUrl, setAvatarUrl] = useState<string>(DEFAULT_AVATAR_URL);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -336,9 +337,7 @@ export const UserMenu: React.FC = () => {
       const response = await fetch(`/api/avatar?user=${encodeURIComponent(username)}`);
       if (response.ok) {
         const data = await response.json();
-        if (data.avatar) {
-          setAvatarUrl(data.avatar);
-        }
+        setAvatarUrl(data.avatar || DEFAULT_AVATAR_URL);
       }
     } catch (error) {
       console.error('获取头像失败:', error);

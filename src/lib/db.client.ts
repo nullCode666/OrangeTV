@@ -69,12 +69,12 @@ interface UserCacheStore {
 }
 
 // ---- 常量 ----
-const PLAY_RECORDS_KEY = 'OrangeTV_play_records';
-const FAVORITES_KEY = 'OrangeTV_favorites';
-const SEARCH_HISTORY_KEY = 'OrangeTV_search_history';
+const PLAY_RECORDS_KEY = '一起看_play_records';
+const FAVORITES_KEY = '一起看_favorites';
+const SEARCH_HISTORY_KEY = '一起看_search_history';
 
 // 缓存相关常量
-const CACHE_PREFIX = 'OrangeTV_cache_';
+const CACHE_PREFIX = '一起看_cache_';
 const CACHE_VERSION = '1.0.0';
 const CACHE_EXPIRE_TIME = 60 * 60 * 1000; // 一小时缓存过期
 
@@ -196,7 +196,7 @@ class HybridCacheManager {
   private clearAllCache(): void {
     const keys = Object.keys(localStorage);
     keys.forEach((key) => {
-      if (key.startsWith('OrangeTV_cache_')) {
+      if (key.startsWith('一起看_cache_')) {
         localStorage.removeItem(key);
       }
     });
@@ -1457,7 +1457,7 @@ export async function getSkipConfig(
 
   // localStorage 模式
   try {
-    const raw = localStorage.getItem('OrangeTV_skip_configs');
+    const raw = localStorage.getItem('一起看_skip_configs');
     if (!raw) return null;
     const configs = JSON.parse(raw) as Record<string, SkipConfig>;
     return configs[key] || null;
@@ -1516,10 +1516,10 @@ export async function saveSkipConfig(
   }
 
   try {
-    const raw = localStorage.getItem('OrangeTV_skip_configs');
+    const raw = localStorage.getItem('一起看_skip_configs');
     const configs = raw ? (JSON.parse(raw) as Record<string, SkipConfig>) : {};
     configs[key] = config;
-    localStorage.setItem('OrangeTV_skip_configs', JSON.stringify(configs));
+    localStorage.setItem('一起看_skip_configs', JSON.stringify(configs));
     window.dispatchEvent(
       new CustomEvent('skipConfigsUpdated', {
         detail: configs,
@@ -1586,7 +1586,7 @@ export async function getAllSkipConfigs(): Promise<Record<string, SkipConfig>> {
 
   // localStorage 模式
   try {
-    const raw = localStorage.getItem('OrangeTV_skip_configs');
+    const raw = localStorage.getItem('一起看_skip_configs');
     if (!raw) return {};
     return JSON.parse(raw) as Record<string, SkipConfig>;
   } catch (err) {
@@ -1639,11 +1639,11 @@ export async function deleteSkipConfig(
   }
 
   try {
-    const raw = localStorage.getItem('OrangeTV_skip_configs');
+    const raw = localStorage.getItem('一起看_skip_configs');
     if (raw) {
       const configs = JSON.parse(raw) as Record<string, SkipConfig>;
       delete configs[key];
-      localStorage.setItem('OrangeTV_skip_configs', JSON.stringify(configs));
+      localStorage.setItem('一起看_skip_configs', JSON.stringify(configs));
       window.dispatchEvent(
         new CustomEvent('skipConfigsUpdated', {
           detail: configs,

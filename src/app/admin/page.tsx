@@ -43,12 +43,13 @@ import Image from 'next/image';
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
-import { AdminConfig, AdminConfigResult } from '../../lib/admin.types';
+import { AdminConfig, AdminConfigResult } from '@/lib/admin.types';
 import { getAuthInfoFromBrowserCookie } from '@/lib/auth';
+import { DEFAULT_AVATAR_URL } from '@/lib/avatar';
 
 import DataMigration from '@/components/DataMigration';
-import ThemeManager from '@/components/ThemeManager';
 import PageLayout from '@/components/PageLayout';
+import ThemeManager from '@/components/ThemeManager';
 
 // 统一按钮样式系统
 const buttonStyles = {
@@ -98,12 +99,12 @@ const getUserAvatar = async (username: string): Promise<string | null> => {
     const response = await fetch(`/api/avatar?user=${encodeURIComponent(username)}`);
     if (response.ok) {
       const data = await response.json();
-      return data.avatar || null;
+      return data.avatar || DEFAULT_AVATAR_URL;
     }
   } catch (error) {
     console.error('获取头像失败:', error);
   }
-  return null;
+  return DEFAULT_AVATAR_URL;
 };
 
 // 用户头像组件

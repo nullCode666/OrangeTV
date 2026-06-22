@@ -765,7 +765,7 @@ function LivePageClient() {
         // 所有的请求都带一个 source 参数
         try {
           const url = new URL(context.url);
-          url.searchParams.set('OrangeTV-source', currentSourceRef.current?.key || '');
+          url.searchParams.set('一起看-source', currentSourceRef.current?.key || '');
           context.url = url.toString();
         } catch (error) {
           // ignore
@@ -867,7 +867,7 @@ function LivePageClient() {
 
       // precheck type
       let type = 'm3u8';
-      const precheckUrl = `/api/live/precheck?url=${encodeURIComponent(videoUrl)}&OrangeTV-source=${currentSourceRef.current?.key || ''}`;
+      const precheckUrl = `/api/live/precheck?url=${encodeURIComponent(videoUrl)}&一起看-source=${currentSourceRef.current?.key || ''}`;
       const precheckResponse = await fetch(precheckUrl);
       if (!precheckResponse.ok) {
         console.error('预检查失败:', precheckResponse.statusText);
@@ -889,7 +889,7 @@ function LivePageClient() {
       setUnsupportedType(null);
 
       const customType = { m3u8: m3u8Loader };
-      const targetUrl = `/api/proxy/m3u8?url=${encodeURIComponent(videoUrl)}&OrangeTV-source=${currentSourceRef.current?.key || ''}`;
+      const targetUrl = `/api/proxy/m3u8?url=${encodeURIComponent(videoUrl)}&一起看-source=${currentSourceRef.current?.key || ''}`;
       try {
         // 创建新的播放器实例
         Artplayer.USE_RAF = true;

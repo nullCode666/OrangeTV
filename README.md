@@ -1,10 +1,10 @@
-# OrangeTV
+# 一起看
 
 <div align="center">
-  <img src="public/logo.png" alt="OrangeTV Logo" width="120">
+  <img src="public/logo.png" alt="一起看 Logo" width="120">
 </div>
 
-> 🎬 **OrangeTV** 是一个开箱即用的、跨平台的影视聚合播放器。它基于 **Next.js 14** + **Tailwind&nbsp;CSS** + **TypeScript** 构建，支持多资源搜索、在线播放、收藏同步、播放记录、云端存储，让你可以随时随地畅享海量免费影视内容。
+> 🎬 **一起看** 是一个开箱即用的、跨平台的一起看播放器。它基于 **Next.js 14** + **Tailwind&nbsp;CSS** + **TypeScript** 构建，支持多资源搜索、在线播放、收藏同步、播放记录、云端存储，让你可以随时随地畅享海量免费影视内容。
 
 <div align="center">
 
@@ -71,9 +71,9 @@
 
 ```yml
 services:
-  OrangeTV-core:
-    image: ghcr.io/djteang/orangetv:latest
-    container_name: OrangeTV-core
+  yiqikan-core:
+    build: .
+    container_name: yiqikan-core
     restart: on-failure
     ports:
       - '3000:3000'
@@ -81,22 +81,23 @@ services:
     environment:
       - USERNAME=admin
       - PASSWORD=orange
+      - NEXT_PUBLIC_SITE_NAME=一起看
       - NEXT_PUBLIC_STORAGE_TYPE=kvrocks
-      - KVROCKS_URL=redis://OrangeTV-kvrocks:6666
+      - KVROCKS_URL=redis://yiqikan-kvrocks:6666
     networks:
-      - OrangeTV-network
+      - yiqikan-network
     depends_on:
-      - OrangeTV-kvrocks
-  OrangeTV-kvrocks:
+      - yiqikan-kvrocks
+  yiqikan-kvrocks:
     image: apache/kvrocks
-    container_name: OrangeTV-kvrocks
+    container_name: yiqikan-kvrocks
     restart: unless-stopped
     volumes:
       - kvrocks-data:/var/lib/kvrocks
     networks:
-      - OrangeTV-network
+      - yiqikan-network
 networks:
-  OrangeTV-network:
+  yiqikan-network:
     driver: bridge
 volumes:
   kvrocks-data:
@@ -106,9 +107,9 @@ volumes:
 
 ```yml
 services:
-  OrangeTV-core:
-    image: ghcr.io/djteang/orangetv:latest
-    container_name: OrangeTV-core
+  yiqikan-core:
+    build: .
+    container_name: yiqikan-core
     restart: on-failure
     ports:
       - '3000:3000'
@@ -116,23 +117,24 @@ services:
     environment:
       - USERNAME=admin
       - PASSWORD=orange
+      - NEXT_PUBLIC_SITE_NAME=一起看
       - NEXT_PUBLIC_STORAGE_TYPE=redis
-      - REDIS_URL=redis://OrangeTV-redis:6379
+      - REDIS_URL=redis://yiqikan-redis:6379
     networks:
-      - OrangeTV-network
+      - yiqikan-network
     depends_on:
-      - OrangeTV-redis
-  OrangeTV-redis:
+      - yiqikan-redis
+  yiqikan-redis:
     image: redis:alpine
-    container_name: OrangeTV-redis
+    container_name: yiqikan-redis
     restart: unless-stopped
     networks:
-      - OrangeTV-network
+      - yiqikan-network
     # 请开启持久化，否则升级/重启后数据丢失
     volumes:
       - ./data:/data
 networks:
-  OrangeTV-network:
+  yiqikan-network:
     driver: bridge
 ```
 
@@ -143,9 +145,9 @@ networks:
 3. 使用如下 docker compose
 ```yml
 services:
-  OrangeTV-core:
-    image: ghcr.io/djteang/orangetv:latest
-    container_name: OrangeTV-core
+  yiqikan-core:
+    build: .
+    container_name: yiqikan-core
     restart: on-failure
     ports:
       - '3000:3000'
@@ -153,6 +155,7 @@ services:
     environment:
       - USERNAME=admin
       - PASSWORD=orange
+      - NEXT_PUBLIC_SITE_NAME=一起看
       - NEXT_PUBLIC_STORAGE_TYPE=upstash
       - UPSTASH_URL=上面 https 开头的 HTTPS ENDPOINT
       - UPSTASH_TOKEN=上面的 TOKEN
@@ -203,7 +206,7 @@ custom_category 支持的自定义分类已知如下：
 
 也可输入如 "哈利波特" 效果等同于豆瓣搜索
 
-OrangeTV 支持标准的苹果 CMS V10 API 格式。
+一起看 支持标准的苹果 CMS V10 API 格式。
 
 ## 自动更新
 
@@ -218,7 +221,7 @@ dockge/komodo 等 docker compose UI 也有自动更新功能
 | USERNAME                            | 站长账号           | 任意字符串                       | 无默认，必填字段                                                                                                                     |
 | PASSWORD                            | 站长密码           | 任意字符串                       | 无默认，必填字段                                                                                                                     |
 | SITE_BASE                           | 站点 url              |       形如 https://example.com                  | 空                                                                                                                     |
-| NEXT_PUBLIC_SITE_NAME               | 站点名称                                     | 任意字符串                       | OrangeTV                                                                                                                     |
+| NEXT_PUBLIC_SITE_NAME               | 站点名称                                     | 任意字符串                       | 一起看                                                                                                                     |
 | ANNOUNCEMENT                        | 站点公告                                     | 任意字符串                       | 本网站仅提供影视信息搜索服务，所有内容均来自第三方网站。本站不存储任何视频资源，不对任何内容的准确性、合法性、完整性负责。 |
 | NEXT_PUBLIC_STORAGE_TYPE            | 播放记录/收藏的存储方式                      | redis、kvrocks、upstash | 无默认，必填字段                                                                                                               |
 | KVROCKS_URL                           | kvrocks 连接 url                               | 连接 url                         | 空                                                                                                                         |
@@ -278,20 +281,16 @@ NEXT_PUBLIC_DOUBAN_IMAGE_PROXY_TYPE 选项解释：
 
 ## License
 
-[MIT](LICENSE) © 2025 OrangeTV & Contributors
+[MIT](LICENSE) © 2025 一起看 & Contributors
 
 ## 致谢
 
 - [ts-nextjs-tailwind-starter](https://github.com/theodorusclarence/ts-nextjs-tailwind-starter) — 项目最初基于该脚手架。
 - [LibreTV](https://github.com/LibreSpark/LibreTV) — 由此启发，站在巨人的肩膀上。
-- [MoonTV](https://github.com/MoonTechLab/LunaTV) — 由此启发，第二次站在巨人的肩膀上。
+- [开源项目](https://github.com) — 由此启发，第二次站在巨人的肩膀上。
 - [艾福森昵] - 感谢论坛佬友提供的短剧API
 - [ArtPlayer](https://github.com/zhw2590582/ArtPlayer) — 提供强大的网页视频播放器。
 - [HLS.js](https://github.com/video-dev/hls.js) — 实现 HLS 流媒体在浏览器中的播放支持。
 - [Zwei](https://github.com/bestzwei) — 提供获取豆瓣数据的 cors proxy
 - [CMLiussss](https://github.com/cmliu) — 提供豆瓣 CDN 服务
 - 感谢所有提供免费影视接口的站点。
-
-## Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=MoonTechLab/LunaTV&type=Date)](https://www.star-history.com/#MoonTechLab/LunaTV&Date)

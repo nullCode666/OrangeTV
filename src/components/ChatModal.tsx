@@ -2,9 +2,11 @@
 
 import { MessageCircle, Search, Users, X, Send, UserPlus, Smile, Image as ImageIcon, Paperclip } from 'lucide-react';
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { ChatMessage, Conversation, Friend, FriendRequest, WebSocketMessage } from '../lib/types';
-import { getAuthInfoFromBrowserCookie } from '../lib/auth';
+
 import { useWebSocket } from '../hooks/useWebSocket';
+import { getAuthInfoFromBrowserCookie } from '../lib/auth';
+import { DEFAULT_AVATAR_URL } from '../lib/avatar';
+import { ChatMessage, Conversation, Friend, FriendRequest, WebSocketMessage } from '../lib/types';
 import { useToast } from './Toast';
 
 interface ChatModalProps {
@@ -393,8 +395,7 @@ export function ChatModal({
     if (realAvatar) {
       return realAvatar; // 返回Base64格式的真实头像
     }
-    // 使用Dicebear API生成默认头像
-    return `https://api.dicebear.com/7.x/initials/svg?seed=${username}&backgroundColor=3B82F6,8B5CF6,EC4899,10B981,F59E0B&textColor=ffffff`;
+    return DEFAULT_AVATAR_URL;
   };
 
   // 获取用户显示名称

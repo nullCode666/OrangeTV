@@ -1,13 +1,10 @@
 {
-  "name": "OrangeTV",
+  "name": "一起看",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "pnpm gen:manifest && node simple-dev.js",
-    "dev:complex": "pnpm gen:manifest && node dev-server.js",
     "dev:ws": "node standalone-websocket.js",
-    "test:ws": "node test-websocket-connection.js",
-    "debug:api": "node debug-api.js",
     "build": "pnpm gen:manifest && next build",
     "start": "NODE_ENV=production node server.js",
     "prod": "NODE_ENV=production node production.js",

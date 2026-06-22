@@ -18,7 +18,7 @@ async function searchShortDrama(query: string, page = 1, limit = 20): Promise<an
       method: 'GET',
       headers: {
         'Accept': 'application/json',
-        'User-Agent': 'LunaTV/1.0',
+        'User-Agent': 'YiQiKan/1.0',
       },
       signal: controller.signal,
     });
